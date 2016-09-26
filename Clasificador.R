@@ -1,11 +1,11 @@
 #Clasificador  Naive Bayes  Identificador de Tweets
 #Cargamos el set de datos 
-clinton<-tweetsc.df
+clinton<-clintontweets
 trump1<-tweetst.df
-trump2<-tweetst.df[1:125,]
-clin2<-clinton[1:125,]
-trump3<-tweetst.df[126:188,]
-clint3<-clinton[126:189,]
+trump2<-tweetst.df[1:566,]
+clin2<-clinton[1:566,]
+trump3<-tweetst.df[567:755,]
+clint3<-clinton[567:755,]
 
 #Generamos un conjunto de entrenamiento y otro de prueba  para el modelo
 training<-rbind(trump2,clin2)
@@ -18,33 +18,104 @@ test<-rbind(trump3,clint3)
 trump2["class"]<-rep("trump",nrow(trump2))
 clin2["class"]<-rep("clinton",nrow(clin2))
 
-# Ahora se crea una funcion que  pre.procese los tweets 
-replacePunctuation <- function(x)
-{
-  x <- tolower(x)
-  x <- gsub("[.]+[ ]"," ",x)
-  x <- gsub("[:]+[ ]"," ",x)
-  x <- gsub("[?]"," ",x)
-  x <- gsub("[!]"," ",x)
-  x <- gsub("[;]"," ",x)
-  x <- gsub("[,]"," ",x)
-  x
-}
+#Limpieza del Texto Pre-Procesamiento
+#Construyamos el Corpus indicando que la fuente es un vector de caracteres
+myCorpus<-Corpus(VectorSource(clin2$text))
 
-trump2$Tweet <- replacePunctuation(trump2$text)
-clin2$Tweet <- replacePunctuation(clin2$text)
-test$Tweet <- replacePunctuation(test$text)
+#El texto del corpus  se convierte en texto plano
+mycorpus <- tm_map(myCorpus, PlainTextDocument)
 
-#Ahora hacemos uso de la libreia tm para generar el corpus y posterior  la matriz de #terminos-documentos
+#El texto del corpus  se convierte en texto plano
+mycorpus <- tm_map(myCorpus, PlainTextDocument)
+#Se remueven los signos de puntuacion
+myCorpus <- tm_map(myCorpus, removePunctuation)
+# Se remueven los numeros 
+myCorpus <- tm_map(myCorpus, removeNumbers)
+# Se remueven los  URLs
+removeURL <- function(x) gsub("http[[:alnum:]]*", "", x)
+myCorpus <- tm_map(myCorpus, removeURL)
+#El texto del corpus  se convierte en  minusculas
+myCorpus <- tm_map(myCorpus, tolower)
+#El texto del corpus  se convierte en texto plano
+mycorpus <- tm_map(myCorpus, PlainTextDocument)
+#Se remueven las  stop words
+myStopwords <- c(stopwords("english"))
+myStopwords <- c(stopwords("english"), "the", "to","of","on","that","in","in","for","a")
+myCorpus <- tm_map(myCorpus, removeWords, myStopwords)
+#Guardamos una copia del  corpus
+myCorpusCopy <- myCorpus
+# Aplicamos el proceso de steaming 
+myCorpus <- tm_map(myCorpus, stemDocument)
 
-tcorpus <- Corpus(VectorSource(as.vector(trump2$text)))
-ccorpus <- Corpus(VectorSource(as.vector(clin2$text)))
-corpustest <- Corpus(VectorSource(as.vector(test$text)))
 
 
-tmatrix <- t(TermDocumentMatrix(tcorpus,control = list(wordLengths=c(4,Inf))));
-cmatrix <- t(TermDocumentMatrix(ccorpus,control = list(wordLengths=c(4,Inf))));
-testmatrix <- t(TermDocumentMatrix(corpustest,control = list(wordLengths=c(4,Inf))));
+
+myCorpus2<-Corpus(VectorSource(trump2$text))
+
+#El texto del corpus  se convierte en texto plano
+mycorpus2<- tm_map(myCorpus2, PlainTextDocument)
+
+#El texto del corpus  se convierte en texto plano
+mycorpus2 <- tm_map(myCorpus2, PlainTextDocument)
+#Se remueven los signos de puntuacion
+myCorpus2 <- tm_map(myCorpus2, removePunctuation)
+# Se remueven los numeros 
+myCorpus2 <- tm_map(myCorpus2, removeNumbers)
+# Se remueven los  URLs
+removeURL <- function(x) gsub("http[[:alnum:]]*", "", x)
+myCorpus2 <- tm_map(myCorpus2, removeURL)
+#El texto del corpus  se convierte en  minusculas
+myCorpus2<- tm_map(myCorpus2, tolower)
+#El texto del corpus  se convierte en texto plano
+mycorpus2 <- tm_map(myCorpus2, PlainTextDocument)
+#Se remueven las  stop words
+myStopwords <- c(stopwords("english"))
+myStopwords <- c(stopwords("english"), "the", "to","of","on","that","in","in","for","a")
+myCorpus2 <- tm_map(myCorpus2, removeWords, myStopwords)
+#Guardamos una copia del  corpus
+myCorpusCopy2 <- myCorpus2
+# Aplicamos el proceso de steaming 
+myCorpus2<- tm_map(myCorpus2, stemDocument)
+
+
+
+
+myCorpus3<-Corpus(VectorSource(test$text))
+
+#El texto del corpus  se convierte en texto plano
+mycorpus3<- tm_map(myCorpus3, PlainTextDocument)
+
+#El texto del corpus  se convierte en texto plano
+mycorpus3 <- tm_map(myCorpus3, PlainTextDocument)
+#Se remueven los signos de puntuacion
+myCorpus3 <- tm_map(myCorpus3, removePunctuation)
+# Se remueven los numeros 
+myCorpus3 <- tm_map(myCorpus3, removeNumbers)
+# Se remueven los  URLs
+removeURL <- function(x) gsub("http[[:alnum:]]*", "", x)
+myCorpus3 <- tm_map(myCorpus3, removeURL)
+#El texto del corpus  se convierte en  minusculas
+myCorpus3<- tm_map(myCorpus3, tolower)
+#El texto del corpus  se convierte en texto plano
+mycorpus3 <- tm_map(myCorpus3, PlainTextDocument)
+#Se remueven las  stop words
+myStopwords <- c(stopwords("english"))
+myStopwords <- c(stopwords("english"), "the", "to","of","on","that","in","in","for","a")
+myCorpus3 <- tm_map(myCorpus3, removeWords, myStopwords)
+#Guardamos una copia del  corpus
+myCorpusCopy3 <- myCorpus3
+# Aplicamos el proceso de steaming 
+myCorpus3<- tm_map(myCorpus3, stemDocument)
+
+
+
+
+
+
+
+tmatrix <- t(TermDocumentMatrix(myCorpus,control = list(wordLengths=c(4,Inf))));
+cmatrix <- t(TermDocumentMatrix(yCorpus2,control = list(wordLengths=c(4,Inf))));
+testmatrix <- t(TermDocumentMatrix(yCorpus3,control = list(wordLengths=c(4,Inf))));
 
 #ahora se tiene que construir el modelo, para ello  se tiene que calcular las #probabilidades  del modelo,contar el numero de apariciones de cada palabra,añadir  la #estimacion de laplace, posterior calcular el log de las probabilidades y guardar en un #archivo csv.
 
@@ -113,3 +184,6 @@ for(documentNumber in 1:nrow(testmatrix))
 
 #visualizamos los resultados del clasificador
 View(cbind(classified,test$test))
+
+resultados<-cbind(classified,test$test)
+summary(resultados)
